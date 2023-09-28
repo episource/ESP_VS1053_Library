@@ -175,6 +175,7 @@ void VS1053::begin() {
         // Increase SC_MULT (VS1053 CLKI multiplier) first to support higher SPI rates
         writeRegister(SCI_CLOCKF, VS1053_SCI_CLOCKF);
         VS1053_SPI = SPISettings(VS1053_FAST_SCK, MSBFIRST, SPI_MODE0);
+        delay(1);
 
         writeRegister(SCI_MODE, _BV(SM_SDINEW) | _BV(SM_LINE1));
         testComm("Fast SPI, Testing VS1053 read/write registers again...\n");
