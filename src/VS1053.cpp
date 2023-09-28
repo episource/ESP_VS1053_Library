@@ -171,8 +171,9 @@ void VS1053::begin() {
         //softReset();
         // Switch on the analog parts
         writeRegister(SCI_AUDATA, 44101); // 44.1kHz stereo
-        // The next clocksetting allows SPI clocking at 5 MHz, 4 MHz is safe then.
-        writeRegister(SCI_CLOCKF, 6 << 12); // Normal clock settings multiplyer 3.0 = 12.2 MHz
+        // set SC_MULT=3.5 and SC_ADD=1.0 as per datasheet recommendation (section 4.2, SCI_CLOCKF=0x8800)
+        // higher SC_MULT and resulting CLKI are needed vor VS1053 to handle higher SPI rates SCK_max = CLKI/7
+        writeRegister(SCI_CLOCKF, 0x8800);
         // SPI Clock to 4 MHz. Now you can set high speed SPI clock.
         VS1053_SPI = SPISettings(4000000, MSBFIRST, SPI_MODE0);
         writeRegister(SCI_MODE, _BV(SM_SDINEW) | _BV(SM_LINE1));
