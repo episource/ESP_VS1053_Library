@@ -163,7 +163,7 @@ void VS1053::begin() {
     digitalWrite(cs_pin, HIGH);
     delay(500);
     // Init SPI in slow mode ( 0.2 MHz )
-    VS1053_SPI = SPISettings(200000, MSBFIRST, SPI_MODE0);
+    VS1053_SPI = SPISettings(VS1053_SLOW_SCK, MSBFIRST, SPI_MODE0);
     // printDetails("Right after reset/startup");
     delay(20);
     // printDetails("20 msec after reset");
@@ -171,11 +171,11 @@ void VS1053::begin() {
         //softReset();
         // Switch on the analog parts
         writeRegister(SCI_AUDATA, 44101); // 44.1kHz stereo
-        // set SC_MULT=3.5 and SC_ADD=1.0 as per datasheet recommendation (section 4.2, SCI_CLOCKF=0x8800)
-        // higher SC_MULT and resulting CLKI are needed vor VS1053 to handle higher SPI rates SCK_max = CLKI/7
-        writeRegister(SCI_CLOCKF, 0x8800);
-        // SPI Clock to 4 MHz. Now you can set high speed SPI clock.
-        VS1053_SPI = SPISettings(4000000, MSBFIRST, SPI_MODE0);
+
+        // Increase SC_MULT (VS1053 CLKI multiplier) first to support higher SPI rates
+        writeRegister(SCI_CLOCKF, VS1053_SCI_CLOCKF);
+        VS1053_SPI = SPISettings(VS1053_FAST_SCK, MSBFIRST, SPI_MODE0);
+
         writeRegister(SCI_MODE, _BV(SM_SDINEW) | _BV(SM_LINE1));
         testComm("Fast SPI, Testing VS1053 read/write registers again...\n");
         delay(10);
